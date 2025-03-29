@@ -2,7 +2,7 @@
 
 @section('content')
 <h2>Типы форм</h2>
-<a href="{{ route('form_types.create') }}" class="btn btn-success mb-2">Создать новый тип</a>
+<!--<a href="{{ route('form_types.create') }}" class="btn btn-success mb-2">Создать новый тип</a>!-->
 
 <table class="table table-bordered">
     <thead>

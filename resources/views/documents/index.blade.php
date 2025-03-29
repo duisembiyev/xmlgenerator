@@ -3,7 +3,7 @@
 @section('content')
 <h2>Мои документы</h2>
 <a href="{{ route('documents.create') }}" class="btn btn-success mb-2">Создать новый документ</a>
-<a href="{{ route('documents.generate') }}" class="btn btn-primary mb-2">Сгенерировать все документы</a>
+<!--<a href="{{ route('documents.generate') }}" class="btn btn-primary mb-2">Сгенерировать все документы</a>!-->
 
 <table class="table table-bordered">
     <thead>
@@ -21,7 +21,7 @@
             <td>{{ $doc->type }}</td>
             <td>{{ $doc->created_at }}</td>
             <td>
-                <a href="{{ route('documents.edit', $doc->id) }}" class="btn btn-primary btn-sm">Редактировать</a>
+                <!--<a href="{{ route('documents.edit', $doc->id) }}" class="btn btn-primary btn-sm">Редактировать</a>!-->
                 <form action="{{ route('documents.destroy', $doc->id) }}" method="POST" style="display:inline;">
                   @csrf
                   @method('DELETE')

@@ -12,8 +12,9 @@ class DocumentController extends Controller
 {
     public function create()
     {
-        $formTypes = FormType::all();
-        return view('documents.create', compact('formTypes'));
+        $formType = FormType::where('type', 'MainForm')->first();
+
+        return view('documents.create', compact('formType'));
     }
 
     public function store(Request $request)
@@ -31,13 +32,19 @@ class DocumentController extends Controller
             $documentData[$fieldName] = $request->input($fieldName, '');
         }
 
-        Document::create([
-            'login' => Auth::user()->login,
+        $document = \App\Models\Document::create([
+            'login' => auth()->user()->login,
             'type'  => $formType->type,
             'data'  => $documentData,
         ]);
 
-        return redirect()->route('documents.index')->with('success', 'Документ сохранён.');
+        $xmlContent = generateAsycudaXml([$documentData]);
+
+        $fileName = 'asycuda_' . $document->id . '_' . date('Ymd_His') . '.xml';
+
+        return response($xmlContent, 200)
+                ->header('Content-Type', 'application/xml')
+                ->header('Content-Disposition', "attachment; filename={$fileName}");
     }
 
     public function index()
