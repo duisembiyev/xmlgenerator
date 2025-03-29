@@ -25,32 +25,19 @@ class DocumentController extends Controller
         $formType = FormType::findOrFail($request->form_type_id);
         $fields = $formType->addionals['fields'] ?? [];
 
-        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><document></document>');
-        $xml->addChild('type', $formType->type);
-
-        $dataNode = $xml->addChild('data');
+        $documentData = [];
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            $value = $request->input($fieldName, '');
-            $dataNode->addChild($fieldName, htmlspecialchars($value));
+            $documentData[$fieldName] = $request->input($fieldName, '');
         }
-
-        $xmlContent = $xml->asXML();
-        
-        //TODO: нужно подкорректировать и расширить
-        //$xmlContent = generateAsycudaXml($data); //Это для того что б по щаблону астана1 делался генерация
-
-        $fileName = 'doc_' . Str::random(8) . '.xml';
-        $filePath = 'documents/' . $fileName;
-        \Storage::disk('public')->put($filePath, $xmlContent);
 
         Document::create([
             'login' => Auth::user()->login,
             'type'  => $formType->type,
-            'file_name' => $filePath,
+            'data'  => $documentData,
         ]);
 
-        return redirect()->route('documents.index')->with('success', 'Документ сгенерирован!');
+        return redirect()->route('documents.index')->with('success', 'Документ сохранён.');
     }
 
     public function index()
@@ -61,20 +48,37 @@ class DocumentController extends Controller
         return view('documents.index', compact('documents'));
     }
 
-    public function download($id)
+    public function edit($id)
     {
         $document = Document::findOrFail($id);
-
         if ($document->login !== Auth::user()->login) {
             abort(403);
         }
+        $formTypes = FormType::all();
+        return view('documents.edit', compact('document', 'formTypes'));
+    }
 
-        $filePath = public_path('storage/' . $document->file_name);
-        if (!file_exists($filePath)) {
-            abort(404);
+    public function update(Request $request, $id)
+    {
+        $document = Document::findOrFail($id);
+        if ($document->login !== Auth::user()->login) {
+            abort(403);
         }
-
-        return response()->download($filePath);
+        $request->validate([
+            'form_type_id' => 'required|exists:form_types,id',
+        ]);
+        $formType = FormType::findOrFail($request->form_type_id);
+        $fields = $formType->addionals['fields'] ?? [];
+        $documentData = [];
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            $documentData[$fieldName] = $request->input($fieldName, '');
+        }
+        $document->update([
+            'type' => $formType->type,
+            'data' => $documentData,
+        ]);
+        return redirect()->route('documents.index')->with('success', 'Документ обновлён.');
     }
 
     public function destroy($id)
@@ -85,13 +89,24 @@ class DocumentController extends Controller
             abort(403);
         }
 
-        $filePath = public_path('storage/' . $document->file_name);
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
-
         $document->delete();
 
         return redirect()->route('documents.index')->with('success', 'Документ удалён.');
+    }
+
+    public function generateAll()
+    {
+        $documents = Document::where('login', Auth::user()->login)->get();
+
+        $documentsData = $documents->map(function ($doc) {
+            return array_merge(['type' => $doc->type], $doc->data ?? []);
+        })->toArray();
+
+        $xmlContent = generateAsycudaXml($documentsData);
+
+        $fileName = 'asycuda_' . date('Ymd_His') . '.xml';
+        return response($xmlContent)
+            ->header('Content-Type', 'application/xml')
+            ->header('Content-Disposition', 'attachment; filename='.$fileName);
     }
 }

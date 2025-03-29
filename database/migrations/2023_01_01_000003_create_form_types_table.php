@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('form_types', function (Blueprint $table) {
             $table->id();
-            $table->string('type');          // имя типа формы
-            $table->json('addionals')->nullable(); // json с конфигурацией полей формы
-            $table->timestamps();            // created_at / updated_at
-            $table->string('created_by');    // login пользователя, кто создал
+            $table->string('type');
+            $table->json('addionals')->nullable();
+            $table->timestamps();
+            $table->string('created_by');
         });
     }
 

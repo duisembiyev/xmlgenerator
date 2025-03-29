@@ -1,78 +1,69 @@
 <?php
 
-if (! function_exists('generateAsycudaXml')) {
+if (!function_exists('generateAsycudaXml')) {
     /**
-     * @param array $data
+     * @param array $documentsData
      * @return string
      */
-    function generateAsycudaXml(array $data = [])
+    function generateAsycudaXml(array $documentsData = [])
     {
-        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8" standalone="no"?><ASYCUDA></ASYCUDA>');
+        $root = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8" standalone="no"?><Documents></Documents>');
 
-        $node = $xml->addChild('Spec_circumstance_indicator_code');
-        $node->addChild('null');
+        foreach ($documentsData as $docData) {
+            $xml = $root->addChild('ASYCUDA');
 
-        $node = $xml->addChild('Spec_circumstance_indicator_name');
-        $node->addChild('null');
+            $xml->addChild('Spec_circumstance_indicator_code', $docData['spec_circumstance_indicator_code'] ?? '');
+            $xml->addChild('Spec_circumstance_indicator_name', $docData['spec_circumstance_indicator_name'] ?? '');
+            $xml->addChild('Total_gross_mass_kg', $docData['total_gross_mass'] ?? '');
+            $xml->addChild('Unique_consignment_trsp_refer_no', $docData['unique_consignment_trsp_refer_no'] ?? '');
+            $xml->addChild('Notify_party_code', $docData['notify_party_code'] ?? '');
+            $xml->addChild('Notify_party_name', $docData['notify_party_name'] ?? '');
+            $xml->addChild('Arrival_on_customs_territory_date', $docData['arrival_date'] ?? '');
+            $xml->addChild('Arrival_on_customs_territory_time', $docData['arrival_time'] ?? '');
 
-        $xml->addChild('Total_gross_mass_kg', $data['total_gross_mass'] ?? '9095.3');
+            for ($i = 1; $i <= 4; $i++) {
+                $xml->addChild("Office_transit_code_{$i}", $docData["office_transit_code_{$i}"] ?? '');
+                $xml->addChild("Country_transit_code_{$i}", $docData["country_transit_code_{$i}"] ?? '');
+                $xml->addChild("Date_transit_{$i}", $docData["date_transit_{$i}"] ?? '');
+            }
 
-        $xml->addChild('Unique_consignment_trsp_refer_no')->addChild('null');
-        $xml->addChild('Notify_party_code')->addChild('null');
-        $xml->addChild('Notify_party_name')->addChild('null');
+            $property = $xml->addChild('Property');
+            $property->addChild('Free_text_for_additional_document', $docData['free_text_for_additional_document'] ?? '');
+            $property->addChild('Sad_flow', $docData['sad_flow'] ?? '');
+            $forms = $property->addChild('Forms');
+            $forms->addChild('Number_of_the_form', $docData['number_of_the_form'] ?? '');
+            $forms->addChild('Total_number_of_forms', $docData['total_number_of_forms'] ?? '');
+            $nbers = $property->addChild('Nbers');
+            $nbers->addChild('Number_of_loading_lists', $docData['number_of_loading_lists'] ?? '');
+            $nbers->addChild('Total_number_of_items', $docData['total_number_of_items'] ?? '');
+            $nbers->addChild('Total_number_of_packages', $docData['total_number_of_packages'] ?? '');
+            $nbers->addChild('Total_number_of_consignments', $docData['total_number_of_consignments'] ?? '');
 
-        $xml->addChild('Arrival_on_customs_territory_date');
-        $xml->addChild('Arrival_on_customs_territory_time');
+            $identification = $xml->addChild('Identification');
+            $officeSegment = $identification->addChild('Office_segment');
+            $officeSegment->addChild('Customs_clearance_office_code', $docData['customs_clearance_office_code'] ?? '');
+            $departureSegment = $officeSegment->addChild('Departure_segment');
+            $departureSegment->addChild('Customs_departure_office_code', $docData['departure_office'] ?? '');
+            $destinationSegment = $officeSegment->addChild('Destination_segment');
+            $destinationSegment->addChild('Customs_office_of_destination_code', $docData['destination_office'] ?? '');
+            $destinationSegment->addChild('Country_of_CUO_of_destination', $docData['destination_country'] ?? '');
 
-        $xml->addChild('Office_transit_code_1')->addChild('null');
-        $xml->addChild('Country_transit_code_1')->addChild('null');
-        $xml->addChild('Date_transit_1');
-        $xml->addChild('Office_transit_code_2')->addChild('null');
-        $xml->addChild('Country_transit_code_2')->addChild('null');
-        $xml->addChild('Date_transit_2');
-        $xml->addChild('Office_transit_code_3')->addChild('null');
-        $xml->addChild('Country_transit_code_3')->addChild('null');
-        $xml->addChild('Date_transit_3');
-        $xml->addChild('Office_transit_code_4')->addChild('null');
-        $xml->addChild('Country_transit_code_4')->addChild('null');
-        $xml->addChild('Date_transit_4');
+            $type = $xml->addChild('Type');
+            $type->addChild('Type_of_declaration', $docData['type_of_declaration'] ?? '');
+            $type->addChild('Declaration_gen_procedure_code', $docData['declaration_gen_procedure_code'] ?? '');
+            $type->addChild('Type_of_transit_document2', $docData['type_of_transit_document2'] ?? '');
+            $type->addChild('Type_of_transit_document3', $docData['transit_document3'] ?? '');
 
-        $property = $xml->addChild('Property');
-        $property->addChild('Free_text_for_additional_document')->addChild('null');
-        $property->addChild('Sad_flow');
-        $forms = $property->addChild('Forms');
-        $forms->addChild('Number_of_the_form', '1');
-        $forms->addChild('Total_number_of_forms', '1');
+            $xml->addChild('Manifest_reference_number', $docData['manifest_reference_number'] ?? '');
+            $xml->addChild('External_flag', $docData['external_flag'] ?? '');
+            $xml->addChild('Non_conform_flag', $docData['non_conform_flag'] ?? '');
 
-        $nbers = $property->addChild('Nbers');
-        $nbers->addChild('Number_of_loading_lists', '1');
-        $nbers->addChild('Total_number_of_items', '1');
-        $nbers->addChild('Total_number_of_packages', '33');
-        $nbers->addChild('Total_number_of_consignments', '1');
+            $invoice = $xml->addChild('Invoice');
+            $invoice->addChild('Invoice_Amount', $docData['invoice_amount'] ?? '');
+            $invoice->addChild('Invoice_Currency_Code', $docData['invoice_currency'] ?? '');
 
-        $identification = $xml->addChild('Identification');
-        $officeSegment = $identification->addChild('Office_segment');
-        $officeSegment->addChild('Customs_clearance_office_code')->addChild('null');
-        $departureSegment = $officeSegment->addChild('Departure_segment');
-        $departureSegment->addChild('Customs_departure_office_code', $data['departure_office'] ?? '39855508');
-        $destinationSegment = $officeSegment->addChild('Destination_segment');
-        $destinationSegment->addChild('Customs_office_of_destination_code', $data['destination_office'] ?? '10311020');
-        $destinationSegment->addChild('Country_of_CUO_of_destination', $data['destination_country'] ?? 'RU');
+        }
 
-        $type = $xml->addChild('Type');
-        $type->addChild('Type_of_declaration')->addChild('null');
-        $type->addChild('Declaration_gen_procedure_code')->addChild('null');
-        $type->addChild('Type_of_transit_document2')->addChild('null');
-        $type->addChild('Type_of_transit_document3', $data['transit_document3'] ?? 'ИМ');
-
-        $xml->addChild('Manifest_reference_number')->addChild('null');
-        $xml->addChild('External_flag', 'false');
-        $xml->addChild('Non_conform_flag', 'false');
-
-        $invoice = $xml->addChild('Invoice');
-        $invoice->addChild('Invoice_Amount', $data['invoice_amount'] ?? '48533.76');
-        $invoice->addChild('Invoice_Currency_Code', $data['invoice_currency'] ?? 'USD');
-
-        return $xml->asXML();
+        return $root->asXML();
     }
 }

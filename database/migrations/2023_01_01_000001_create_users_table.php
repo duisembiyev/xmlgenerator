@@ -11,12 +11,12 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->text('full_name')->nullable();
-            $table->string('name')->nullable();    // например, короткое имя
-            $table->string('login')->unique();     // уникальный логин
+            $table->string('name')->nullable();
+            $table->string('login')->unique();
             $table->string('password');
             $table->string('phone_number')->nullable();
-            $table->string('avatar')->nullable();  // ссылка на аватар
-            $table->timestamps();                  // created_at / updated_at
+            $table->string('avatar')->nullable();
+            $table->timestamps();
         });
     }
 

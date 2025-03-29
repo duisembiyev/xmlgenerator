@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<h2>Генерация документа</h2>
-
+<h2>Создать новый документ</h2>
 <form method="POST" action="{{ route('documents.store') }}" id="docForm">
     @csrf
     <div class="mb-3">
@@ -17,7 +16,7 @@
 
     <div id="dynamicFields"></div>
 
-    <button type="submit" class="btn btn-success mt-3">Сгенерировать XML</button>
+    <button type="submit" class="btn btn-success mt-3">Сохранить документ</button>
 </form>
 
 <script>

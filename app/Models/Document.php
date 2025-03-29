@@ -14,7 +14,11 @@ class Document extends Model
     protected $fillable = [
         'login',
         'type',
-        'file_name'
+        'data'
+    ];
+
+    protected $casts = [
+        'data' => 'array'
     ];
 
     public function user()
