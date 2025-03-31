@@ -6,7 +6,6 @@ use App\Models\Document;
 use App\Models\FormType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class DocumentController extends Controller
 {
@@ -24,7 +23,7 @@ class DocumentController extends Controller
         ]);
 
         $formType = FormType::findOrFail($request->form_type_id);
-        $fields = $formType->addionals['fields'] ?? [];
+        $fields   = $formType->addionals['fields'] ?? [];
 
         $documentData = [];
         foreach ($fields as $field) {
@@ -32,7 +31,10 @@ class DocumentController extends Controller
             $documentData[$fieldName] = $request->input($fieldName, '');
         }
 
-        $document = \App\Models\Document::create([
+        $items = $request->input('items', []); 
+        $documentData['items'] = $items;
+
+        $document = Document::create([
             'login' => auth()->user()->login,
             'type'  => $formType->type,
             'data'  => $documentData,
@@ -71,27 +73,34 @@ class DocumentController extends Controller
         if ($document->login !== Auth::user()->login) {
             abort(403);
         }
+
         $request->validate([
             'form_type_id' => 'required|exists:form_types,id',
         ]);
+
         $formType = FormType::findOrFail($request->form_type_id);
-        $fields = $formType->addionals['fields'] ?? [];
+        $fields   = $formType->addionals['fields'] ?? [];
+
         $documentData = [];
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             $documentData[$fieldName] = $request->input($fieldName, '');
         }
+
+        $items = $request->input('items', []);
+        $documentData['items'] = $items;
+
         $document->update([
             'type' => $formType->type,
             'data' => $documentData,
         ]);
+
         return redirect()->route('documents.index')->with('success', 'Документ обновлён.');
     }
 
     public function destroy($id)
     {
         $document = Document::findOrFail($id);
-
         if ($document->login !== Auth::user()->login) {
             abort(403);
         }

@@ -241,6 +241,82 @@ if (!function_exists('generateAsycudaXml')) {
             $item->addChild('Dangerous_goods_code', $docData['dangerous_goods_code'] ?? '');
             $item->addChild('Dangerous_goods_name', $docData['dangerous_goods_name'] ?? '');
             
+            if (!empty($docData['items']) && is_array($docData['items'])) {
+                foreach ($docData['items'] as $itemData) {
+                    $item = $xml->addChild('Item');
+                    $item->addChild('Consignment_number', $itemData['consignment_number'] ?? '');
+                    $item->addChild('Is_new_consignment', $itemData['is_new_consignment'] ?? '');
+                    
+                    $itemConsignee = $item->addChild('Consignee');
+                    $itemConsignee->addChild('Consignee_code', $itemData['item_consignee_code'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_name', $itemData['item_consignee_name'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_ctyCod', $itemData['item_consignee_ctyCod'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_regDsc', $itemData['item_consignee_regDsc'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_regCod', $itemData['item_consignee_regCod'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_catCod', $itemData['item_consignee_catCod'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_street', $itemData['item_consignee_street'] ?? '');
+                    $itemConsignee->addChild('CONSIGNEE_city', $itemData['item_consignee_city'] ?? '');
+                    
+                    $itemExporter = $item->addChild('Exporter');
+                    $itemExporter->addChild('Exporter_code', $itemData['item_exporter_code'] ?? '');
+                    $itemExporter->addChild('EXPORTER_name', $itemData['item_exporter_name'] ?? '');
+                    $itemExporter->addChild('EXPORTER_ctyCod', $itemData['item_exporter_ctyCod'] ?? '');
+                    $itemExporter->addChild('EXPORTER_regDsc', $itemData['item_exporter_regDsc'] ?? '');
+                    $itemExporter->addChild('EXPORTER_regCod', $itemData['item_exporter_regCod'] ?? '');
+                    $itemExporter->addChild('EXPORTER_catCod', $itemData['item_exporter_catCod'] ?? '');
+                    $itemExporter->addChild('EXPORTER_street', $itemData['item_exporter_street'] ?? '');
+                    $itemExporter->addChild('EXPORTER_city', $itemData['item_exporter_city'] ?? '');
+                    
+                    $item->addChild('Dangerous_goods_code', $itemData['dangerous_goods_code'] ?? '');
+                    $item->addChild('Dangerous_goods_name', $itemData['dangerous_goods_name'] ?? '');
+                    
+                    $packages = $item->addChild('Packages');
+                    $packages->addChild('Number_of_packages', $itemData['number_of_packages'] ?? '');
+                    $packages->addChild('Marks1_of_packages', $itemData['marks1_of_packages'] ?? '');
+                    $packages->addChild('Kind_of_packages_code', $itemData['kind_of_packages_code'] ?? '');
+                    
+                    $tarification = $item->addChild('Tarification');
+                    $hscode = $tarification->addChild('HScode');
+                    $hscode->addChild('Commodity_code', $itemData['commodity_code'] ?? '');
+                    $tarification->addChild('Unit_of_measure_code', $itemData['unit_of_measure_code'] ?? '');
+                    $tarification->addChild('Quantity', $itemData['quantity'] ?? '');
+                    $tarification->addChild('Item_currency_code', $itemData['item_currency_code'] ?? '');
+                    $tarification->addChild('Item_price', $itemData['item_price'] ?? '');
+                    
+                    if (!empty($itemData['attached_documents']) && is_array($itemData['attached_documents'])) {
+                        foreach ($itemData['attached_documents'] as $attachedDoc) {
+                            $attached = $item->addChild('Attached_documents');
+                            $attached->addChild('Attached_document_code', $attachedDoc['code'] ?? '');
+                            $attached->addChild('Attached_document_reference', $attachedDoc['reference'] ?? '');
+                            $attached->addChild('Attached_document_date', $attachedDoc['date'] ?? '');
+                        }
+                    } else {
+                        $attached = $item->addChild('Attached_documents');
+                        $attached->addChild('Attached_document_code', $itemData['attached_document_code'] ?? '');
+                        $attached->addChild('Attached_document_reference', $itemData['attached_document_reference'] ?? '');
+                        $attached->addChild('Attached_document_date', $itemData['attached_document_date'] ?? '');
+                    }
+                    
+                    $goods = $item->addChild('Goods_description');
+                    $goods->addChild('Container_1', $itemData['container_1'] ?? '');
+                    $goods->addChild('Container_2', $itemData['container_2'] ?? '');
+                    $goods->addChild('Description_of_goods', $itemData['description_of_goods'] ?? '');
+                    $goods->addChild('Commercial_Description', $itemData['commercial_description'] ?? '');
+                    
+                    $prevDoc = $item->addChild('Previous_documents');
+                    $prevDoc->addChild('PrevDocCod', $itemData['prev_doc_cod'] ?? '');
+                    $prevDoc->addChild('PrevDocNbr', $itemData['prev_doc_nbr'] ?? '');
+                    $prevDoc->addChild('PrevDocDat', $itemData['prev_doc_dat'] ?? '');
+                    $prevDoc->addChild('PrevDocMan', $itemData['prev_doc_man'] ?? '');
+                    $prevDoc->addChild('PrevDocNational', $itemData['prev_doc_national'] ?? '');
+                    
+                    $valuation = $item->addChild('Valuation_item');
+                    $weight = $valuation->addChild('Weight_itm');
+                    $weight->addChild('Gross_weight_itm', $itemData['gross_weight_itm'] ?? '');
+                    $weight->addChild('Net_weight_itm', $itemData['net_weight_itm'] ?? '');
+                }
+            }            
+
             $packages = $item->addChild('Packages');
             $packages->addChild('Number_of_packages', $docData['number_of_packages'] ?? '');
             $packages->addChild('Marks1_of_packages', $docData['marks1_of_packages'] ?? '');
