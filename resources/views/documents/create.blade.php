@@ -13,6 +13,13 @@
         font-size: 16px;
         margin-left: 8px;
     }
+    input[type="date"],
+    input[type="datetime-local"] {
+        width: auto;
+        max-width: 200px;
+        padding: 4px 8px;
+        display: inline-block;
+    }
 </style>
 
 <form method="POST" action="{{ route('documents.store') }}">
@@ -33,16 +40,19 @@
     <div class="tab-content" id="documentTabsContent">
         <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
             <h4>Основные поля</h4>
-            <div id="dynamicFields">
+            <div class="row" id="dynamicFields">
                 @foreach($formType->addionals['fields'] as $field)
                     @if(! str_starts_with($field['name'], 'item_'))
-                        <div class="form-group">
+                        <div class="col-md-3 mb-3">
                             <label for="{{ $field['name'] }}">{{ $field['label'] ?? $field['name'] }}</label>
                             <input 
                                 type="{{ $field['type'] ?? 'text' }}"
                                 class="form-control"
                                 name="{{ $field['name'] }}"
                                 id="{{ $field['name'] }}"
+                                @if(isset($field['type']) && in_array($field['type'], ['date', 'datetime-local']))
+                                    placeholder="{{ $field['type'] == 'date' ? 'ГГГГ-ММ-ДД' : 'ГГГГ-ММ-ДД ЧЧ:ММ' }}"
+                                @endif
                             >
                         </div>
                     @endif
@@ -86,202 +96,219 @@
 
         tabContent.innerHTML = `
         <h4>Поля для Item</h4>
-
-        <div class="form-group">
-            <label>Consignment number</label>
-            <input type="text" class="form-control" name="items[${itemCount}][consignment_number]">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Consignment number</label>
+                <input type="text" class="form-control" name="items[${itemCount}][consignment_number]">
+            </div>
+            <div class="col-md-4">
+                <label>Is new consignment?</label><br>
+                <input type="checkbox" name="items[${itemCount}][is_new_consignment]" value="1">
+            </div>
         </div>
-
-        <div class="form-group">
-            <label>Is new consignment?</label>
-            <input type="checkbox" name="items[${itemCount}][is_new_consignment]" value="1">
-        </div>
-
         <hr>
         <h5>Consignee</h5>
-        <div class="form-group">
-            <label>Consignee code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_code]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Consignee code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_code]">
+            </div>
+            <div class="col-md-3">
+                <label>CONSIGNEE_name</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_name]">
+            </div>
+            <div class="col-md-3">
+                <label>CONSIGNEE_ctyCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_ctyCod]">
+            </div>
+            <div class="col-md-3">
+                <label>CONSIGNEE_regDsc</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_regDsc]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>CONSIGNEE_name</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_name]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>CONSIGNEE_regCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_regCod]">
+            </div>
+            <div class="col-md-3">
+                <label>CONSIGNEE_catCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_catCod]">
+            </div>
+            <div class="col-md-3">
+                <label>CONSIGNEE_street</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_street]">
+            </div>
+            <div class="col-md-3">
+                <label>CONSIGNEE_city</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_consignee_city]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>CONSIGNEE_ctyCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_ctyCod]">
-        </div>
-        <div class="form-group">
-            <label>CONSIGNEE_regDsc</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_regDsc]">
-        </div>
-        <div class="form-group">
-            <label>CONSIGNEE_regCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_regCod]">
-        </div>
-        <div class="form-group">
-            <label>CONSIGNEE_catCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_catCod]">
-        </div>
-        <div class="form-group">
-            <label>CONSIGNEE_street</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_street]">
-        </div>
-        <div class="form-group">
-            <label>CONSIGNEE_city</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_consignee_city]">
-        </div>
-
         <hr>
         <h5>Exporter</h5>
-        <div class="form-group">
-            <label>Exporter_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_code]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Exporter_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_code]">
+            </div>
+            <div class="col-md-3">
+                <label>EXPORTER_name</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_name]">
+            </div>
+            <div class="col-md-3">
+                <label>EXPORTER_ctyCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_ctyCod]">
+            </div>
+            <div class="col-md-3">
+                <label>EXPORTER_regDsc</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_regDsc]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>EXPORTER_name</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_name]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>EXPORTER_regCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_regCod]">
+            </div>
+            <div class="col-md-3">
+                <label>EXPORTER_catCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_catCod]">
+            </div>
+            <div class="col-md-3">
+                <label>EXPORTER_street</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_street]">
+            </div>
+            <div class="col-md-3">
+                <label>EXPORTER_city</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_exporter_city]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>EXPORTER_ctyCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_ctyCod]">
-        </div>
-        <div class="form-group">
-            <label>EXPORTER_regDsc</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_regDsc]">
-        </div>
-        <div class="form-group">
-            <label>EXPORTER_regCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_regCod]">
-        </div>
-        <div class="form-group">
-            <label>EXPORTER_catCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_catCod]">
-        </div>
-        <div class="form-group">
-            <label>EXPORTER_street</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_street]">
-        </div>
-        <div class="form-group">
-            <label>EXPORTER_city</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_exporter_city]">
-        </div>
-
         <hr>
         <h5>Dangerous goods</h5>
-        <div class="form-group">
-            <label>Dangerous_goods_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][dangerous_goods_code]">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Dangerous_goods_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][dangerous_goods_code]">
+            </div>
+            <div class="col-md-6">
+                <label>Dangerous_goods_name</label>
+                <input type="text" class="form-control" name="items[${itemCount}][dangerous_goods_name]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Dangerous_goods_name</label>
-            <input type="text" class="form-control" name="items[${itemCount}][dangerous_goods_name]">
-        </div>
-
         <hr>
         <h5>Packages</h5>
-        <div class="form-group">
-            <label>Number_of_packages</label>
-            <input type="text" class="form-control" name="items[${itemCount}][number_of_packages]">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Number_of_packages</label>
+                <input type="text" class="form-control" name="items[${itemCount}][number_of_packages]">
+            </div>
+            <div class="col-md-4">
+                <label>Marks1_of_packages</label>
+                <input type="text" class="form-control" name="items[${itemCount}][marks1_of_packages]">
+            </div>
+            <div class="col-md-4">
+                <label>Kind_of_packages_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][kind_of_packages_code]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Marks1_of_packages</label>
-            <input type="text" class="form-control" name="items[${itemCount}][marks1_of_packages]">
-        </div>
-        <div class="form-group">
-            <label>Kind_of_packages_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][kind_of_packages_code]">
-        </div>
-
         <hr>
         <h5>Tarification</h5>
-        <div class="form-group">
-            <label>Commodity_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][commodity_code]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Commodity_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][commodity_code]">
+            </div>
+            <div class="col-md-3">
+                <label>Unit_of_measure_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][unit_of_measure_code]">
+            </div>
+            <div class="col-md-3">
+                <label>Quantity</label>
+                <input type="text" class="form-control" name="items[${itemCount}][quantity]">
+            </div>
+            <div class="col-md-3">
+                <label>Item_currency_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_currency_code]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Unit_of_measure_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][unit_of_measure_code]">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Item_price</label>
+                <input type="text" class="form-control" name="items[${itemCount}][item_price]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Quantity</label>
-            <input type="text" class="form-control" name="items[${itemCount}][quantity]">
-        </div>
-        <div class="form-group">
-            <label>Item_currency_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_currency_code]">
-        </div>
-        <div class="form-group">
-            <label>Item_price</label>
-            <input type="text" class="form-control" name="items[${itemCount}][item_price]">
-        </div>
-
         <hr>
         <h5>Attached documents</h5>
-        <div class="form-group">
-            <label>Attached_document_code</label>
-            <input type="text" class="form-control" name="items[${itemCount}][attached_document_code]">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Attached_document_code</label>
+                <input type="text" class="form-control" name="items[${itemCount}][attached_document_code]">
+            </div>
+            <div class="col-md-4">
+                <label>Attached_document_reference</label>
+                <input type="text" class="form-control" name="items[${itemCount}][attached_document_reference]">
+            </div>
+            <div class="col-md-4">
+                <label>Attached_document_date</label>
+                <input type="date" class="form-control" name="items[${itemCount}][attached_document_date]" placeholder="ГГГГ-ММ-ДД">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Attached_document_reference</label>
-            <input type="text" class="form-control" name="items[${itemCount}][attached_document_reference]">
-        </div>
-        <div class="form-group">
-            <label>Attached_document_date</label>
-            <input type="date" class="form-control" name="items[${itemCount}][attached_document_date]">
-        </div>
-
         <hr>
         <h5>Goods description</h5>
-        <div class="form-group">
-            <label>Container_1</label>
-            <input type="text" class="form-control" name="items[${itemCount}][container_1]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Container_1</label>
+                <input type="text" class="form-control" name="items[${itemCount}][container_1]">
+            </div>
+            <div class="col-md-3">
+                <label>Container_2</label>
+                <input type="text" class="form-control" name="items[${itemCount}][container_2]">
+            </div>
+            <div class="col-md-3">
+                <label>Description_of_goods</label>
+                <input type="text" class="form-control" name="items[${itemCount}][description_of_goods]">
+            </div>
+            <div class="col-md-3">
+                <label>Commercial_Description</label>
+                <input type="text" class="form-control" name="items[${itemCount}][commercial_description]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Container_2</label>
-            <input type="text" class="form-control" name="items[${itemCount}][container_2]">
-        </div>
-        <div class="form-group">
-            <label>Description_of_goods</label>
-            <input type="text" class="form-control" name="items[${itemCount}][description_of_goods]">
-        </div>
-        <div class="form-group">
-            <label>Commercial_Description</label>
-            <input type="text" class="form-control" name="items[${itemCount}][commercial_description]">
-        </div>
-
         <hr>
         <h5>Previous documents</h5>
-        <div class="form-group">
-            <label>PrevDocCod</label>
-            <input type="text" class="form-control" name="items[${itemCount}][prev_doc_cod]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>PrevDocCod</label>
+                <input type="text" class="form-control" name="items[${itemCount}][prev_doc_cod]">
+            </div>
+            <div class="col-md-3">
+                <label>PrevDocNbr</label>
+                <input type="text" class="form-control" name="items[${itemCount}][prev_doc_nbr]">
+            </div>
+            <div class="col-md-3">
+                <label>PrevDocDat</label>
+                <input type="date" class="form-control" name="items[${itemCount}][prev_doc_dat]" placeholder="ГГГГ-ММ-ДД">
+            </div>
+            <div class="col-md-3">
+                <label>PrevDocMan</label>
+                <input type="text" class="form-control" name="items[${itemCount}][prev_doc_man]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>PrevDocNbr</label>
-            <input type="text" class="form-control" name="items[${itemCount}][prev_doc_nbr]">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>PrevDocNational</label>
+                <input type="text" class="form-control" name="items[${itemCount}][prev_doc_national]">
+            </div>
         </div>
-        <div class="form-group">
-            <label>PrevDocDat</label>
-            <input type="date" class="form-control" name="items[${itemCount}][prev_doc_dat]">
-        </div>
-        <div class="form-group">
-            <label>PrevDocMan</label>
-            <input type="text" class="form-control" name="items[${itemCount}][prev_doc_man]">
-        </div>
-        <div class="form-group">
-            <label>PrevDocNational</label>
-            <input type="text" class="form-control" name="items[${itemCount}][prev_doc_national]">
-        </div>
-
         <hr>
         <h5>Valuation item</h5>
-        <div class="form-group">
-            <label>Gross_weight_itm</label>
-            <input type="text" class="form-control" name="items[${itemCount}][gross_weight_itm]">
-        </div>
-        <div class="form-group">
-            <label>Net_weight_itm</label>
-            <input type="text" class="form-control" name="items[${itemCount}][net_weight_itm]">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Gross_weight_itm</label>
+                <input type="text" class="form-control" name="items[${itemCount}][gross_weight_itm]">
+            </div>
+            <div class="col-md-6">
+                <label>Net_weight_itm</label>
+                <input type="text" class="form-control" name="items[${itemCount}][net_weight_itm]">
+            </div>
         </div>
         `;
         document.getElementById('documentTabsContent').appendChild(tabContent);
