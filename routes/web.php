@@ -40,4 +40,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/documents/{id}/view', [DocumentController::class, 'showDocument'])->name('documents.view');
+    
+    //Если тигкер не позволяет > вставлять писать то по роуту можно чекнуть!
+    Route::get('/test', function () {
+        $ft = App\Models\FormType::where('type', 'MainForm')->first();
+        dd($ft->toArray());
+    });    
 });
