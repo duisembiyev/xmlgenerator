@@ -14,7 +14,8 @@ class Document extends Model
     protected $fillable = [
         'login',
         'type',
-        'data'
+        'data',
+        'doc_link',
     ];
 
     protected $casts = [

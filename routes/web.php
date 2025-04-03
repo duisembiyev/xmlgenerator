@@ -39,4 +39,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/form-types/{id}', [FormTypeController::class, 'destroy'])->name('form_types.destroy');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/documents/{id}/view', [DocumentController::class, 'showDocument'])->name('documents.view');
 });

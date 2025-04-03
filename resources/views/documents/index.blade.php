@@ -27,6 +27,22 @@
                   @method('DELETE')
                   <button class="btn btn-danger btn-sm" onclick="return confirm('Удалить документ?')">Удалить</button>
                 </form>
+                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#docModal{{ $doc->id }}">Посмотреть</button>
+                <a href="{{ route('documents.view', $doc->id) }}" class="btn btn-success btn-sm" download>Скачать</a>
+
+                <div class="modal fade" id="docModal{{ $doc->id }}" tabindex="-1" aria-labelledby="docModalLabel{{ $doc->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="docModalLabel{{ $doc->id }}">Содержимое документа #{{ $doc->id }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <iframe src="{{ route('documents.view', $doc->id) }}" style="width: 100%; height: 500px;" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </td>
         </tr>
     @endforeach

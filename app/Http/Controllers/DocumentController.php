@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\FormType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -44,9 +45,27 @@ class DocumentController extends Controller
 
         $fileName = 'asycuda_' . $document->id . '_' . date('Ymd_His') . '.xml';
 
+        Storage::disk('public')->put('doc/' . $fileName, $xmlContent);
+
+        $document->update(['doc_link' => 'doc/' . $fileName]);
+
         return response($xmlContent, 200)
-                ->header('Content-Type', 'application/xml')
-                ->header('Content-Disposition', "attachment; filename={$fileName}");
+            ->header('Content-Type', 'application/xml')
+            ->header('Content-Disposition', "attachment; filename={$fileName}");
+    }
+
+    public function showDocument($id)
+    {
+        $document = Document::findOrFail($id);
+        if ($document->login !== auth()->user()->login) {
+            abort(403);
+        }
+        if (!$document->doc_link) {
+            abort(404, 'Документ не найден.');
+        }
+        $xmlContent = Storage::disk('public')->get($document->doc_link);
+        return response($xmlContent, 200)
+            ->header('Content-Type', 'application/xml');
     }
 
     public function index()
