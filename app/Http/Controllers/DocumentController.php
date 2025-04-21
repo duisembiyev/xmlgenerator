@@ -12,39 +12,22 @@ class DocumentController extends Controller
 {
     public function create()
     {
-        $formType = FormType::where('type', 'MainForm')->first();
-
-        return view('documents.create', compact('formType'));
+        return view('documents.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'form_type_id' => 'required|exists:form_types,id',
-        ]);
-
-        $formType = FormType::findOrFail($request->form_type_id);
-        $fields   = $formType->addionals['fields'] ?? [];
-
-        $documentData = [];
-        foreach ($fields as $field) {
-            $fieldName = $field['name'];
-            $documentData[$fieldName] = $request->input($fieldName, '');
-        }
-
-        $items = $request->input('items', []); 
-        $documentData['items'] = $items;
+        $documentData = $request->except(['_token']);
 
         $document = Document::create([
             'login' => auth()->user()->login,
-            'type'  => $formType->type,
+            'type'  => 'MainForm',
             'data'  => $documentData,
         ]);
 
         $xmlContent = generateAsycudaXml([$documentData]);
 
         $fileName = 'asycuda_' . $document->id . '_' . date('Ymd_His') . '.xml';
-
         Storage::disk('public')->put('doc/' . $fileName, $xmlContent);
 
         $document->update(['doc_link' => 'doc/' . $fileName]);

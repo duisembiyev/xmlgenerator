@@ -41,7 +41,7 @@ class UserController extends Controller
         $user = Auth::user();
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
+            $user->avatar = 'storage/' . $path;
             $user->save();
         }
 
